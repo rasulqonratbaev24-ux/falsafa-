@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <title>Falsafiy Family Feud - Steve Harvey Style</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a2e;
+            color: #ffffff;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 { color: #f1c40f; text-shadow: 2px 2px #000; }
+        
+        /* Scoreboard */
+        .teams-container {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+        .team-card {
+            background-color: #16213e;
+            border: 2px solid #0f3460;
+            border-radius: 10px;
+            padding: 10px 20px;
+            width: 18%;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .team-card h3 { margin: 5px 0; color: #e94560; }
+        .score { font-size: 24px; font-weight: bold; color: #f1c40f; }
+
+        /* Game Board */
+        .board {
+            background-color: #0f3460;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(241, 196, 15, 0.4);
+        }
+        .question { font-size: 22px; margin-bottom: 20px; color: #ffffff; }
+        
+        .answer-slot {
+            background-color: #1a1a2e;
+            border: 2px solid #f1c40f;
+            margin: 10px 0;
+            padding: 15px;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            transition: 0.3s;
+        }
+        .answer-slot:hover { background-color: #16213e; }
+        .hidden-text { color: #f1c40f; }
+        
+        /* Strike System */
+        .strikes { font-size: 40px; color: #e94560; margin: 15px 0; height: 50px; }
+        
+        /* Controls */
+        .btn {
+            background-color: #e94560;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover { background-color: #ff6b6b; }
+        .btn-add { background-color: #2ecc71; }
+        .btn-add:hover { background-color: #27ae60; }
+    </style>
+</head>
+<body>
+
+    <h1>FALSAFIY "FAMILY FEUD" (OILA JANGI)</h1>
+
+    <!-- 4 ta Guruh Ochkolar Doskasi -->
+    <div class="teams-container">
+        <div class="team-card">
+            <h3>1-Guruh</h3>
+            <div class="score" id="score1">0</div>
+            <button class="btn btn-add" onclick="addPoints(1)">+ Ochko berish</button>
+        </div>
+        <div class="team-card">
+            <h3>2-Guruh</h3>
+            <div class="score" id="score2">0</div>
+            <button class="btn btn-add" onclick="addPoints(2)">+ Ochko berish</button>
+        </div>
+        <div class="team-card">
+            <h3>3-Guruh</h3>
+            <div class="score" id="score3">0</div>
+            <button class="btn btn-add" onclick="addPoints(3)">+ Ochko berish</button>
+        </div>
+        <div class="team-card">
+            <h3>4-Guruh</h3>
+            <div class="score" id="score4">0</div>
+            <button class="btn btn-add" onclick="addPoints(4)">+ Ochko berish</button>
+        </div>
+    </div>
+
+    <!-- O'yin Doskasi -->
+    <div class="board">
+        <div class="question" id="question-text">Raund Yuklanmoqda...</div>
+        
+        <div id="answers-container"></div>
+
+        <!-- X (Strike) Bo'limi -->
+        <div class="strikes" id="strike-display"></div>
+        
+        <div>
+            <button class="btn" onclick="addStrike()">❌ XATO (X)</button>
+            <button class="btn" onclick="resetStrikes()">X larni tozalash</button>
+            <button class="btn" style="background-color: #3498db;" onclick="nextRound()">Keyingi Raund ➡️</button>
+        </div>
+    </div>
+
+    <script>
+        // Savollar va Javoblar Bazasi
+        const rounds = [
+            {
+                question: "1-RAUND: Odamlardan 'Eng mashhur faylasuf kim?' deb so'ralganda berilgan top-4 javob:",
+                answers: [
+                    { text: "1. Sokrat", points: 40, revealed: false },
+                    { text: "2. Aristotel", points: 30, revealed: false },
+                    { text: "3. Platon", points: 20, revealed: false },
+                    { text: "4. Forobiy / Ibn Sina", points: 10, revealed: false }
+                ]
+            },
+            {
+                question: "2-RAUND: Tunda uxlolmay yotganda xayolga keladigan top-4 falsafiy savol:",
+                answers: [
+                    { text: "1. Hayotimning ma'nosi nima?", points: 45, revealed: false },
+                    { text: "2. Kelajakda men bilan nima bo'ladi?", points: 25, revealed: false },
+                    { text: "3. Nega dunyoda adolatsizlik bor?", points: 20, revealed: false },
+                    { text: "4. Koinotning oxiri bormi?", points: 10, revealed: false }
+                ]
+            },
+            {
+                question: "3-RAUND: Falsafa fanining javob izlaydigan top-4 asosiy bo'limi:",
+                answers: [
+                    { text: "1. Borliq va Olam (Ontologiya)", points: 35, revealed: false },
+                    { text: "2. Bilim va Haqiqat (Gnoseologiya)", points: 30, revealed: false },
+                    { text: "3. Axloq va Odamaviylik (Etika)", points: 25, revealed: false },
+                    { text: "4. Go'zallik va San'at (Estetika)", points: 10, revealed: false }
+                ]
+            }
+        ];
+
+        let currentRound = 0;
+        let scores = [0, 0, 0, 0];
+        let roundTotal = 0;
+        let strikes = 0;
+
+        function loadRound() {
+            const roundData = rounds[currentRound];
+            document.getElementById('question-text').innerText = roundData.question;
+            const container = document.getElementById('answers-container');
+            container.innerHTML = '';
+            roundTotal = 0;
+            resetStrikes();
+
+            roundData.answers.forEach((ans, index) => {
+                const div = document.createElement('div');
+                div.className = 'answer-slot';
+                div.onclick = () => revealAnswer(index);
+                
+                if (ans.revealed) {
+                    div.innerHTML = `<span>${ans.text}</span> <span>${ans.points} pt</span>`;
+                    div.style.borderColor = '#2ecc71';
+                } else {
+                    div.innerHTML = `<span class="hidden-text">[ ${index + 1} - JAVOB ]</span> <span>??</span>`;
+                }
+                container.appendChild(div);
+            });
+        }
+
+        function revealAnswer(index) {
+            const ans = rounds[currentRound].answers[index];
+            if (!ans.revealed) {
+                ans.revealed = true;
+                roundTotal += ans.points;
+                loadRound();
+            }
+        }
+
+        function addStrike() {
+            if (strikes < 3) {
+                strikes++;
+                document.getElementById('strike-display').innerText = '❌ '.repeat(strikes);
+            }
+        }
+
+        function resetStrikes() {
+            strikes = 0;
+            document.getElementById('strike-display').innerText = '';
+        }
+
+        function addPoints(teamIndex) {
+            scores[teamIndex - 1] += roundTotal;
+            document.getElementById(`score${teamIndex}`).innerText = scores[teamIndex - 1];
+            roundTotal = 0;
+        }
+
+        function nextRound() {
+            if (currentRound < rounds.length - 1) {
+                currentRound++;
+                loadRound();
+            } else {
+                alert("O'yin yakunlandi! Eng yuqori ochko to'plagan guruh g'olib!");
+            }
+        }
+
+        // O'yinni boshlash
+        loadRound();
+    </script>
+</body>
+</html>
